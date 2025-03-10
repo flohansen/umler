@@ -23,6 +23,24 @@ void free_parser(Parser *parser) {
     free(parser);
 }
 
+NodeList *parser_parse(Parser *parser) {
+    NodeList *list = create_node_list(1);
+
+    while (!parser_check_token(parser, TOKEN_TYPE_EOF)) {
+        if (parser_check_value(parser, "class")) {
+            Node *node = parser_parse_class(parser);
+            if (!node) {
+                free_node_list(list);
+                return NULL;
+            }
+
+            node_list_append(list, node);
+        }
+    }
+
+    return list;
+}
+
 int parser_expect_token(Parser *parser, TokenType type, Token *token) {
     if (parser->lexer->token.type != type) {
         return 0;
@@ -186,4 +204,31 @@ void free_node(Node *node) {
     }
 
     free(node);
+}
+
+NodeList *create_node_list(size_t cap) {
+    NodeList *list = (NodeList *)malloc(sizeof(NodeList));
+    list->items = (Node **)malloc(cap * sizeof(Node *));
+    list->cap = cap;
+    list->len = 0;
+    return list;
+}
+
+void node_list_append(NodeList *list, Node *node) {
+    if (list->len >= list->cap) {
+        list->cap *= 2;
+        list->items = realloc(list->items, list->cap * sizeof(Node *));
+    }
+
+    list->items[list->len++] = node;
+}
+
+void free_node_list(NodeList *list) {
+    for (size_t i = 0; i < list->len; ++i) {
+        Node *node = list->items[i];
+        free_node(node);
+    }
+
+    free(list->items);
+    free(list);
 }

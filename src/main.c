@@ -1,5 +1,5 @@
-#include "lexer.h"
 #include "parser.h"
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -19,19 +19,14 @@ int main(int argc, char** argv) {
     }
     
     Parser *parser = create_parser(file);
+    NodeList *nodes = parser_parse(parser);
 
-    while (!parser_check_token(parser, TOKEN_TYPE_EOF)) {
-        if (parser_check_value(parser, "class")) {
-            Node *node = parser_parse_class(parser);
-            if (!node) {
-                printf("Error: Could not parse class node\n");
-                return EXIT_FAILURE;
-            }
-
-            node_print(node);
-            free_node(node);
-        }
+    for (size_t i = 0; i < nodes->len; ++i) {
+        Node *node = nodes->items[i];
+        node_print(node);
     }
+
+    free_node_list(nodes);
 
     fclose(file);
     return EXIT_SUCCESS;
