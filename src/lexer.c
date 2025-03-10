@@ -41,10 +41,8 @@ int lexer_next(Lexer *lexer) {
         lexer_parse_char(lexer, TOKEN_TYPE_PARENTHESES_OPEN);
     } else if (c == ')') {
         lexer_parse_char(lexer, TOKEN_TYPE_PARENTHESES_CLOSE);
-    } else if (c == '+') {
-        lexer_parse_char(lexer, TOKEN_TYPE_PLUS);
-    } else if (c == '-') {
-        lexer_parse_char(lexer, TOKEN_TYPE_MINUS);
+    } else if (c == '+' || c == '-') {
+        lexer_parse_char(lexer, TOKEN_TYPE_OPERATOR);
     } else if (c == '~') {
         lexer_parse_char(lexer, TOKEN_TYPE_TILDE);
     } else {
@@ -115,12 +113,8 @@ const char *token_type_str(TokenType type) {
             return "PARENTHESES OPEN";
         case TOKEN_TYPE_PARENTHESES_CLOSE:
             return "PARENTHESES CLOSE";
-        case TOKEN_TYPE_PLUS:
-            return "PLUS";
-        case TOKEN_TYPE_MINUS:
-            return "MINUS";
-        case TOKEN_TYPE_TILDE:
-            return "TILDE";
+        case TOKEN_TYPE_OPERATOR:
+            return "OPERATOR";
         default:
             return "CHAR";
     }

@@ -1,9 +1,7 @@
 #include "lexer.h"
+#include "parser.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-
-const int READ_BUF_SIZE = 1024;
 
 void print_usage();
 
@@ -16,30 +14,32 @@ int main(int argc, char** argv) {
     const char *filename = argv[1];
     FILE *file = fopen(filename, "r");
     if (!file) {
-        printf("Error: Could not open file");
+        printf("Error: Could not open file\n");
         return EXIT_FAILURE;
     }
+    
+    Parser *parser = create_parser(file);
 
-    Lexer *lexer = create_lexer();
+    while (!parser_check_token(parser, TOKEN_TYPE_EOF)) {
+        if (parser_check_value(parser, "class")) {
+            Node *node = parser_parse_class(parser);
+            if (!node) {
+                printf("Error: Could not parse class node\n");
+                return EXIT_FAILURE;
+            }
 
-    char buf[READ_BUF_SIZE];
-    while (fgets(buf, READ_BUF_SIZE, file)) {
-        lexer_input(lexer, buf, strlen(buf));
-
-        while (lexer_next(lexer)) {
-            char *value = strndup(lexer->token.start, lexer->token.len);
-            printf("'%s'\t(%s)\n", value, token_type_str(lexer->token.type));
-            free(value);
+            node_print(node);
+            free_node(node);
         }
     }
 
     fclose(file);
-    free_lexer(lexer);
     return EXIT_SUCCESS;
 }
 
 void print_usage() {
-    const char *usage = "umler v1.0\n"
+    const char *usage =
+        "umler v1.0\n"
         "\n"
         "Usage:\n"
         "umler FILENAME\n";

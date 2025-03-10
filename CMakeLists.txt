@@ -6,4 +6,4 @@ project(
     LANGUAGES C
 )
 
-add_executable(umler src/main.c src/lexer.c)
+add_executable(umler src/main.c src/lexer.c src/parser.c src/list.c)

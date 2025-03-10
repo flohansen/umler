@@ -1,4 +1,7 @@
 class Controller {
-    + nodes: []Node;
-    - n: integer;
+    + nodes: NodeList;
+    - n: Integer;
+}
+
+class Database {
 }
